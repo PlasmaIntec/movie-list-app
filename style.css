@@ -1,0 +1,21 @@
+@import url("https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css");
+
+body {
+  background: #f1f1f1;
+}
+
+h5 {
+  border: 2px solid red;
+  text-align: center;
+  padding: 10px;
+}
+
+@media (max-width: 767px) {
+  .video-list {
+    margin-left: 20px;
+  }
+
+  .video-player {
+    margin-right: 20px;
+  }
+}
