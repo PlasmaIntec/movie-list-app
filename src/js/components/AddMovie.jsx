@@ -10,7 +10,7 @@ var AddMovie = (props) => (
 			placeholder="Add movie title here"
 		/>
 		<button 
-			className="addmovie-button" 
+			className="addmovie-button button" 
 			onClick={props.addToMovieList}>
 			Add
 		</button>
