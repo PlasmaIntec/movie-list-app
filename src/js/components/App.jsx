@@ -2,17 +2,17 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Movie from "./Movie.jsx";
 import Search from "./Search.jsx";
+import AddMovie from "./AddMovie.jsx";
 
 class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			query: '',
 			movieList: [],
 			displayMovieList: []
 		};
-		this.updateQuery = this.updateQuery.bind(this);
 		this.updateDisplayMovieList = this.updateDisplayMovieList.bind(this);
+		this.addToMovieList = this.addToMovieList.bind(this);
 	}
 	componentDidMount() {
 		this.setState({ 
@@ -20,20 +20,29 @@ class App extends React.Component {
 			displayMovieList: this.props.movieList
 		});
 	}
-	updateQuery(event) {
-		this.setState({ query: event.target.value });
-	}
 	updateDisplayMovieList() {
 		var newList = this.state.movieList.filter((movie) => {
-			return movie.title.toLowerCase().indexOf(this.state.query.toLowerCase()) !== -1;
+			return movie.title.toLowerCase().indexOf(this.searchQuery.value.toLowerCase()) !== -1;
 		});
 		this.setState({ displayMovieList: newList });
+		this.searchQuery.value = '';
+	}
+	addToMovieList() {
+		var newList = this.state.movieList;
+		newList.push({ title: this.newTitle.value });
+		this.setState({ movieList: newList});
+		this.updateDisplayMovieList();
+		this.newTitle.value = '';
 	}
 	render() {
 		return (
 			<div>
+				<AddMovie
+					movieTitle={input => this.newTitle = input}
+					addToMovieList={this.addToMovieList}
+				/>
 				<Search 
-					updateQuery={this.updateQuery} 
+					searchQuery={input => this.searchQuery = input}
 					updateDisplayMovieList={this.updateDisplayMovieList}
 				/>
 				{
