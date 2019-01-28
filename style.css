@@ -5,6 +5,7 @@ body {
 }
 
 .movieTitle {
+  font-style: bold;
 }
 
 .movie {
@@ -13,15 +14,18 @@ body {
   margin: 2px;
   padding: 10px;
   background: tan;
+  height: 50px;
   border: 1px solid black;
+}
+
+.info {
+  height: 100px;
 }
 
 .movies {
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
   width: 500px;
-  height: 400px;
   align-content: space-between;      
 }
 
@@ -37,13 +41,18 @@ body {
   color: black;
 }
 
-.watched {
+.green {
   background: green;
   color: white;
 }
 
-.to-watch {
+.red {
   background: red;
+  color: black;
+}
+
+.neutral {
+  background: white
   color: black;
 }
 

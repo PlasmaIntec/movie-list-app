@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import Search from "./Search.jsx";
 import AddMovie from "./AddMovie.jsx";
 import MovieList from "./MovieList.jsx";
+import searchMovieDB from "./SearchMovieDB.jsx";
 
 class App extends React.Component {
 	constructor(props) {
@@ -29,7 +30,6 @@ class App extends React.Component {
 		});
 	}
 	toggleWatchedStatus(event) {
-		event.persist();
 		var title = event.target.title;
 		var index = this.state.movieList.map(movie => movie.title).indexOf(title);
 		var newList = this.state.movieList;
@@ -50,19 +50,23 @@ class App extends React.Component {
 		});
 		this.setState({ displayMovieList: newList });
 		this.searchQuery.value = '';
+		this.newTitle.value = '';	
 	}
 	addToMovieList() {
 		var newList = this.state.movieList;
-		if (this.newTitle.value.length > 0) {
-			newList.push({ title: this.newTitle.value, watched: false });
-			this.setState({ movieList: newList});
-			this.newTitle.value = '';
-			this.updateDisplayMovieList();
+		if (this.newTitle.value.length > 0) {			
+			searchMovieDB(this.newTitle.value, (result) => {
+				newList.push({ title: result.title, watched: false });
+				this.setState({ movieList: newList});
+				this.updateDisplayMovieList();				
+			});
 		} else {
 			alert('NOT LONG'); // TODO: tooltip
 		}
 	}
 	render() {
+		let toWatchClassName = this.state.currentTab === 'toWatch' ? 'green' : 'neutral';
+		let watchedClassName = this.state.currentTab === 'watched' ? 'green' : 'neutral';
 		return (
 			<div>
 				<AddMovie
@@ -74,8 +78,8 @@ class App extends React.Component {
 					updateDisplayMovieList={this.updateDisplayMovieList}
 				/>
 				<div className="tabs">
-					<button onClick={this.showToWatch}>To Watch</button>
-					<button onClick={this.showWatched}>Watched</button>
+					<button className={toWatchClassName} onClick={this.showToWatch}>To Watch</button>
+					<button className={watchedClassName} onClick={this.showWatched}>Watched</button>
 				</div>
 				<div>
 					<MovieList 
