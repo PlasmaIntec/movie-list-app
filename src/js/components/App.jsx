@@ -11,21 +11,23 @@ class App extends React.Component {
 		this.state = {
 			movieList: [],
 			displayMovieList: [],
-			currentTab: "toWatch"
+			currentTab: "toWatch",
+			activeKey: '0'
 		};
 		this.updateDisplayMovieList = this.updateDisplayMovieList.bind(this);
 		this.addToMovieList = this.addToMovieList.bind(this);
 		this.showWatched = this.showWatched.bind(this);
 		this.showToWatch = this.showToWatch.bind(this);
 		this.toggleWatchedStatus = this.toggleWatchedStatus.bind(this);
+		this.handleSelect = this.handleSelect.bind(this);
 	}
 	showToWatch() {
-		this.setState({ currentTab: "toWatch" }, () => {
+		this.setState({ currentTab: "toWatch", activeKey: '0' }, () => {
 			this.updateDisplayMovieList();		
 		});
 	}
 	showWatched() {
-		this.setState({ currentTab: "watched" }, () => {
+		this.setState({ currentTab: "watched", activeKey: '0' }, () => {
 			this.updateDisplayMovieList();		
 		});
 	}
@@ -33,32 +35,67 @@ class App extends React.Component {
 		var title = event.target.title;
 		var index = this.state.movieList.map(movie => movie.title).indexOf(title);
 		var newList = this.state.movieList;
-		newList[index].watched = newList[index].watched ? false : true;
-		this.setState({ movieList: newList });
+		newList[index].watched = !newList[index].watched;
+		this.setState({ movieList: newList, activeKey: '0' });
 		this.updateDisplayMovieList();		
 	}
+	handleSelect(activeKey) {
+		this.setState({ activeKey });
+	}
 	componentDidMount() {
-		this.setState({ 
-			movieList: this.props.movieList,
-			displayMovieList: this.props.movieList
+		var initialMoviePromiseArray = this.props.movieList.map(movie => {
+			return new Promise((resolve, reject) => {
+				searchMovieDB(movie.title, (error, result) => {
+					if (error) { 
+						console.error(error);
+						reject(error);
+					} else {
+						var newMovie = { 
+							title: result.title, 
+							year: result.release_date.slice(0, 4), 
+							rating: result.vote_average,
+							image: 'http://image.tmdb.org/t/p/w185/' + result.poster_path,
+							watched: false, 
+						};
+						resolve(newMovie);
+					}
+				});
+			});
 		});
+		Promise.all(initialMoviePromiseArray)
+			.then(movieList => {
+				this.setState({ 
+					movieList: movieList,
+					displayMovieList: movieList
+				});
+			});
 	}
 	updateDisplayMovieList() {
 		var newList = this.state.movieList.filter((movie) => {
 			return movie.title.toLowerCase().indexOf(this.searchQuery.value.toLowerCase()) !== -1
 				&& movie.watched === (this.state.currentTab === 'watched' ? true : false);
 		});
-		this.setState({ displayMovieList: newList });
+		this.setState({ displayMovieList: newList, activeKey: '0' });
 		this.searchQuery.value = '';
 		this.newTitle.value = '';	
 	}
 	addToMovieList() {
 		var newList = this.state.movieList;
 		if (this.newTitle.value.length > 0) {			
-			searchMovieDB(this.newTitle.value, (result) => {
-				newList.push({ title: result.title, watched: false });
-				this.setState({ movieList: newList});
-				this.updateDisplayMovieList();				
+			searchMovieDB(this.newTitle.value, (error, result) => {
+				if (error) { 
+					console.error(error);
+				} else {
+					newList.push({ 
+						title: result.title, 
+						year: result.release_date.slice(0, 4), 
+						rating: result.vote_average,
+						image: 'http://image.tmdb.org/t/p/w185/' + result.poster_path,
+						watched: false, 
+					});
+					this.setState({ movieList: newList});
+					this.updateDisplayMovieList();
+				}				
 			});
 		} else {
 			alert('NOT LONG'); // TODO: tooltip
@@ -86,6 +123,8 @@ class App extends React.Component {
 						movieList={this.state.displayMovieList} 
 						tab={this.state.currentTab}
 						toggle={this.toggleWatchedStatus}
+						activeKey={this.state.activeKey}
+						handleSelect={this.handleSelect}
 					/>
 				</div>
 			</div>
