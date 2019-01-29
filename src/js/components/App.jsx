@@ -45,7 +45,7 @@ class App extends React.Component {
 	componentDidMount() {
 		var initialMoviePromiseArray = this.props.movieList.map(movie => {
 			return new Promise((resolve, reject) => {
-				searchMovieDB(movie.title, (error, result) => {
+				searchMovieDB(movie, (error, result) => {
 					if (error) { 
 						console.error(error);
 						reject(error);
@@ -132,12 +132,17 @@ class App extends React.Component {
 	}
 }
 
-var movies = [
-  {title: 'Mean Girls', watched: false},
-  {title: 'Hackers', watched: false},
-  {title: 'The Grey', watched: false},
-  {title: 'Sunshine', watched: false},
-  {title: 'Ex Machina', watched: false},
-];
+// var movies = [
+//   {title: 'Mean Girls', watched: false},
+//   {title: 'Hackers', watched: false},
+//   {title: 'The Grey', watched: false},
+//   {title: 'Sunshine', watched: false},
+//   {title: 'Ex Machina', watched: false},
+// ];
+
+var movies = ['Mean Girls', 'Hackers', 'The Grey'];
+
+fetch('localhost:3000/api/movies')
+	.then(res => console.log(res));
 
 ReactDOM.render(<App movieList={movies} />, document.getElementById("app"));
